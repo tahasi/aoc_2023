@@ -1,9 +1,10 @@
+use anyhow::{anyhow, Context, Result};
 use clap::{builder::Str, command, Arg, ArgAction, ArgMatches, Command};
-use log::{debug, error, LevelFilter};
+use log::{debug, LevelFilter};
 
 mod puzzles;
 
-fn main() {
+fn main() -> Result<()> {
     let matches = command!()
         .arg(
             Arg::new("debug")
@@ -18,7 +19,8 @@ fn main() {
     let debug: bool = *matches.get_one("debug").unwrap_or(&false);
     init_logging(debug);
 
-    run_command(matches.subcommand().unwrap());
+    let command = matches.subcommand().context("Expected subcommand")?;
+    run_command(command)
 }
 
 fn init_logging(debug: bool) {
@@ -32,48 +34,56 @@ fn init_logging(debug: bool) {
         .init();
 }
 
-fn run_command(command: (&str, &ArgMatches)) {
+fn run_command(command: (&str, &ArgMatches)) -> Result<()> {
     match command {
         ("all", _) => run_all_puzzles(),
         ("day", args) => run_day_command(args),
-        _ => error!("Use the 'all' or 'day' command to run one or more puzzles"),
+        _ => Err(anyhow!(
+            "Use the 'all' or 'day' command to run one or more puzzles",
+        )),
     }
 }
 
-fn run_all_puzzles() {
+fn run_all_puzzles() -> Result<()> {
     for puzzle in puzzles::puzzles() {
         debug!("Running day '{}' part one:", puzzle.name());
-        puzzle.run_part_one();
+        puzzle.run_part_one()?;
         debug!("Running day '{}' part two:", puzzle.name());
-        puzzle.run_part_two();
+        puzzle.run_part_two()?;
     }
+
+    Ok(())
 }
 
-fn run_day_command(args: &ArgMatches) {
+fn run_day_command(args: &ArgMatches) -> Result<()> {
     match args.subcommand() {
         Some((day_name, args)) => match args.subcommand() {
             Some(("part", args)) => match args.subcommand() {
                 Some((part_name, _)) => run_day_puzzle(day_name, part_name),
-                _ => error!("Missing the part name"),
+                _ => Err(anyhow!("Missing the part name")),
             },
-            Some((unexpected_command, _)) => error!("unhandled command '{}'", unexpected_command),
-            _ => error!("Missing the part"),
+            Some((unexpected_command, _)) => {
+                Err(anyhow!("Unhandled command '{}'", unexpected_command))
+            }
+            _ => Err(anyhow!("Missing the part")),
         },
-        _ => error!("Missing the day name"),
+        _ => Err(anyhow!("Missing the day name")),
     }
 }
 
-fn run_day_puzzle(name: &str, part: &str) {
-    if let Some(puzzle) = puzzles::get_puzzle(name) {
-        if part == "one" || part == "both" {
-            debug!("Running day '{}' part one:", puzzle.name());
-            puzzle.run_part_one();
-        }
-        if part == "two" || part == "both" {
-            debug!("Running day '{}' part two:", puzzle.name());
-            puzzle.run_part_two();
-        }
+fn run_day_puzzle(name: &str, part: &str) -> Result<()> {
+    let puzzle = puzzles::get_puzzle(name)
+        .with_context(|| format!("Unrecognized puzzle name: '{}'", name))?;
+    if part == "one" || part == "both" {
+        debug!("Running day '{}' part one:", puzzle.name());
+        puzzle.run_part_one()?;
     }
+    if part == "two" || part == "both" {
+        debug!("Running day '{}' part two:", puzzle.name());
+        puzzle.run_part_two()?;
+    }
+
+    Ok(())
 }
 
 trait AddPuzzlesCommands {

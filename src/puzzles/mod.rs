@@ -1,3 +1,5 @@
+use thiserror::Error;
+
 pub mod day_01;
 pub mod day_02;
 pub mod day_03;
@@ -24,8 +26,18 @@ pub mod day_23;
 pub mod day_24;
 pub mod day_25;
 
+#[derive(Error, Debug)]
+pub enum PuzzleError {
+    #[error("load data file failure")]
+    LoadDataFailure(#[from] std::io::Error),
+    #[error("not implemented")]
+    NotImplemented,
+}
+
+type Fn = fn() -> Result<(), PuzzleError>;
+
 #[allow(clippy::type_complexity)]
-const PUZZLES: [(&str, fn(), fn()); 25] = [
+const PUZZLES: [(&str, Fn, Fn); 25] = [
     ("one", day_01::run_part_one, day_01::run_part_two),
     ("two", day_02::run_part_one, day_02::run_part_two),
     ("three", day_03::run_part_one, day_03::run_part_two),
@@ -73,12 +85,12 @@ pub fn get_puzzle(name: &str) -> Option<Puzzle> {
 
 pub struct Puzzle {
     name: &'static str,
-    part_one: &'static fn(),
-    part_two: &'static fn(),
+    part_one: &'static Fn,
+    part_two: &'static Fn,
 }
 
 impl Puzzle {
-    fn new(name: &'static str, part_one: &'static fn(), part_two: &'static fn()) -> Self {
+    fn new(name: &'static str, part_one: &'static Fn, part_two: &'static Fn) -> Self {
         Puzzle {
             name,
             part_one,
@@ -90,11 +102,11 @@ impl Puzzle {
         self.name
     }
 
-    pub fn run_part_one(&self) {
+    pub fn run_part_one(&self) -> Result<(), PuzzleError> {
         (*self.part_one)()
     }
 
-    pub fn run_part_two(&self) {
+    pub fn run_part_two(&self) -> Result<(), PuzzleError> {
         (*self.part_two)()
     }
 }
