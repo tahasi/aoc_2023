@@ -1,10 +1,10 @@
 use anyhow::{anyhow, Context, Result};
 use clap::{builder::Str, command, Arg, ArgAction, ArgMatches, Command};
-use log::{debug, LevelFilter};
+use log::{debug, error, LevelFilter};
 
 mod puzzles;
 
-fn main() -> Result<()> {
+fn main() {
     let matches = command!()
         .arg(
             Arg::new("debug")
@@ -19,8 +19,14 @@ fn main() -> Result<()> {
     let debug: bool = *matches.get_one("debug").unwrap_or(&false);
     init_logging(debug);
 
-    let command = matches.subcommand().context("Expected subcommand")?;
-    run_command(command)
+    match matches.subcommand() {
+        Some(command) => {
+            if let Err(error) = run_command(command) {
+                error!("{}", error)
+            }
+        }
+        None => error!("Missing required command"),
+    }
 }
 
 fn init_logging(debug: bool) {
@@ -46,9 +52,9 @@ fn run_command(command: (&str, &ArgMatches)) -> Result<()> {
 
 fn run_all_puzzles() -> Result<()> {
     for puzzle in puzzles::puzzles() {
-        debug!("Running day '{}' part one:", puzzle.name());
+        debug!("Running day {} part one:", puzzle.name());
         puzzle.run_part_one()?;
-        debug!("Running day '{}' part two:", puzzle.name());
+        debug!("Running day {} part two:", puzzle.name());
         puzzle.run_part_two()?;
     }
 
@@ -75,11 +81,11 @@ fn run_day_puzzle(name: &str, part: &str) -> Result<()> {
     let puzzle = puzzles::get_puzzle(name)
         .with_context(|| format!("Unrecognized puzzle name: '{}'", name))?;
     if part == "one" || part == "both" {
-        debug!("Running day '{}' part one:", puzzle.name());
+        debug!("Running day {} part one:", puzzle.name());
         puzzle.run_part_one()?;
     }
     if part == "two" || part == "both" {
-        debug!("Running day '{}' part two:", puzzle.name());
+        debug!("Running day {} part two:", puzzle.name());
         puzzle.run_part_two()?;
     }
 
