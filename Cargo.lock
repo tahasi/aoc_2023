@@ -91,6 +91,7 @@ dependencies = [
  "clap",
  "log",
  "pretty_env_logger",
+ "regex",
  "thiserror",
 ]
 

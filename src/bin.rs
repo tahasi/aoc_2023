@@ -2,7 +2,7 @@ use anyhow::{anyhow, Context, Result};
 use clap::{builder::Str, command, Arg, ArgAction, ArgMatches, Command};
 use log::{debug, error, LevelFilter};
 
-mod puzzles;
+use puzzlelib::{get_puzzle, puzzle_names, puzzles};
 
 fn main() {
     let matches = command!()
@@ -51,7 +51,7 @@ fn run_command(command: (&str, &ArgMatches)) -> Result<()> {
 }
 
 fn run_all_puzzles() -> Result<()> {
-    for puzzle in puzzles::puzzles() {
+    for puzzle in puzzles() {
         debug!("Running day {} part one:", puzzle.name());
         puzzle.run_part_one()?;
         debug!("Running day {} part two:", puzzle.name());
@@ -78,8 +78,8 @@ fn run_day_command(args: &ArgMatches) -> Result<()> {
 }
 
 fn run_day_puzzle(name: &str, part: &str) -> Result<()> {
-    let puzzle = puzzles::get_puzzle(name)
-        .with_context(|| format!("Unrecognized puzzle name: '{}'", name))?;
+    let puzzle =
+        get_puzzle(name).with_context(|| format!("Unrecognized puzzle name: '{}'", name))?;
     if part == "one" || part == "both" {
         debug!("Running day {} part one:", puzzle.name());
         puzzle.run_part_one()?;
@@ -102,7 +102,7 @@ impl AddPuzzlesCommands for Command {
             .disable_help_subcommand(true)
             .subcommand_required(true)
             .about("Runs a specified day's puzzle");
-        for (index, name) in puzzles::puzzle_names().iter().enumerate() {
+        for (index, name) in puzzle_names().iter().enumerate() {
             let alias = Str::from((index + 1).to_string());
             day_command = day_command.subcommand(
                 command!(name)

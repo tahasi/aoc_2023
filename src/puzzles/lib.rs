@@ -1,3 +1,7 @@
+use std::ffi::OsStr;
+use std::path::Path;
+use std::{env, io};
+
 use thiserror::Error;
 
 pub mod day_01;
@@ -28,13 +32,21 @@ pub mod day_25;
 
 #[derive(Error, Debug)]
 pub enum PuzzleError {
-    #[error("load data file failure")]
-    LoadDataFailure(#[from] std::io::Error),
+    #[error("load data file '{path}' failure: {source}")]
+    LoadDataFailure {
+        path: String,
+        source: std::io::Error,
+    },
+    #[error("invalid data at {line}: {reason}")]
+    InvalidData { line: usize, reason: String },
     #[error("not implemented")]
     NotImplemented,
+    #[error("{0}")]
+    Unexpected(String),
 }
 
-type Fn = fn() -> Result<(), PuzzleError>;
+pub type Result<T> = core::result::Result<T, PuzzleError>;
+type Fn = fn() -> Result<()>;
 
 #[allow(clippy::type_complexity)]
 const PUZZLES: [(&str, Fn, Fn); 25] = [
@@ -102,11 +114,32 @@ impl Puzzle {
         self.name
     }
 
-    pub fn run_part_one(&self) -> Result<(), PuzzleError> {
+    pub fn run_part_one(&self) -> Result<()> {
         (*self.part_one)()
     }
 
-    pub fn run_part_two(&self) -> Result<(), PuzzleError> {
+    pub fn run_part_two(&self) -> Result<()> {
         (*self.part_two)()
+    }
+}
+
+impl PuzzleError {
+    fn from_io_error<S: AsRef<OsStr> + ?Sized>(path: &S, source: io::Error) -> Self {
+        let path = path.as_ref().to_string_lossy().to_string();
+        PuzzleError::LoadDataFailure { path, source }
+    }
+}
+
+fn read_data_file(day: i32, part: i32) -> Result<String> {
+    let data_file_name = format!("day_{day:02}.part_{part:02}.data");
+    let exe_path =
+        env::current_exe().map_err(|err| PuzzleError::from_io_error(&data_file_name, err))?;
+    let exe_dir_path = exe_path.parent().ok_or_else(|| {
+        PuzzleError::Unexpected("failed to get executable parent path".to_string())
+    })?;
+    let path = Path::new(exe_dir_path).join(data_file_name);
+    match std::fs::read_to_string(&path) {
+        Ok(string) => Ok(string),
+        Err(err) => Err(PuzzleError::from_io_error(&path, err)),
     }
 }
