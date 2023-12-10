@@ -52,6 +52,87 @@ impl Set {
     }
 }
 
+mod part_one {
+    use super::{parser, Result, Set};
+    use lazy_static::lazy_static;
+    use regex::Regex;
+
+    lazy_static! {
+        static ref RE_GAME_ID: Regex = Regex::new(r"Game (\d+)").expect("failed game id regex");
+        static ref RE_SETS: Regex =
+            Regex::new(r"(\d+) (red|green|blue),?").expect("failed sets regex");
+    }
+
+    pub fn solve(input: &str, bag_content: &Set) -> Result<usize> {
+        let game_sets = parser::parse(input)?
+            .into_iter()
+            .filter(|(_, sets)| sets.iter().all(|set| bag_content.contains(set)));
+        let sum = game_sets.fold(0, |sum, (game_id, _sets)| sum + game_id);
+
+        Ok(sum)
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::{solve, Set};
+
+        #[test]
+        fn part_one() {
+            let input = r#"
+Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
+Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
+Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
+Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"#;
+            let bag_content = Set {
+                red: 12,
+                green: 13,
+                blue: 14,
+            };
+            if let Ok(sum) = solve(input.trim(), &bag_content) {
+                assert_eq!(8, sum);
+            } else {
+                assert!(false);
+            }
+        }
+    }
+}
+
+mod part_two {
+    use super::{parser, Result, Set};
+
+    pub fn solve(input: &str) -> Result<u32> {
+        Ok(parser::parse(input)?
+            .into_iter()
+            .fold(0usize, |sum, (_, sets)| {
+                let super_set = sets
+                    .into_iter()
+                    .fold(Set::empty(), |super_set, set| super_set.union(&set));
+                sum + super_set.power()
+            }) as u32)
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::solve;
+
+        #[test]
+        fn test_two() {
+            let input = r#"
+Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
+Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
+Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
+Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"#;
+            if let Ok(sum) = solve(input.trim()) {
+                assert_eq!(2286, sum);
+            } else {
+                assert!(false);
+            }
+        }
+    }
+}
+
 mod parser {
     use super::{PuzzleError, Result, Set};
     use lazy_static::lazy_static;
@@ -168,86 +249,5 @@ mod parser {
                 })?
                 .build(),
         )
-    }
-}
-
-mod part_one {
-    use super::{parser, Result, Set};
-    use lazy_static::lazy_static;
-    use regex::Regex;
-
-    lazy_static! {
-        static ref RE_GAME_ID: Regex = Regex::new(r"Game (\d+)").expect("failed game id regex");
-        static ref RE_SETS: Regex =
-            Regex::new(r"(\d+) (red|green|blue),?").expect("failed sets regex");
-    }
-
-    pub fn solve(input: &str, bag_content: &Set) -> Result<usize> {
-        let game_sets = parser::parse(input)?
-            .into_iter()
-            .filter(|(_, sets)| sets.iter().all(|set| bag_content.contains(set)));
-        let sum = game_sets.fold(0, |sum, (game_id, _sets)| sum + game_id);
-
-        Ok(sum)
-    }
-
-    #[cfg(test)]
-    mod tests {
-        use super::{solve, Set};
-
-        #[test]
-        fn part_one() {
-            let input = r#"
-Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
-Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
-Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
-Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
-Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"#;
-            let bag_content = Set {
-                red: 12,
-                green: 13,
-                blue: 14,
-            };
-            if let Ok(sum) = solve(input.trim(), &bag_content) {
-                assert_eq!(8, sum);
-            } else {
-                assert!(false);
-            }
-        }
-    }
-}
-
-mod part_two {
-    use super::{parser, Result, Set};
-
-    pub fn solve(input: &str) -> Result<u32> {
-        Ok(parser::parse(input)?
-            .into_iter()
-            .fold(0usize, |sum, (_, sets)| {
-                let super_set = sets
-                    .into_iter()
-                    .fold(Set::empty(), |super_set, set| super_set.union(&set));
-                sum + super_set.power()
-            }) as u32)
-    }
-
-    #[cfg(test)]
-    mod tests {
-        use super::solve;
-
-        #[test]
-        fn test_two() {
-            let input = r#"
-Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
-Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
-Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
-Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
-Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"#;
-            if let Ok(sum) = solve(input.trim()) {
-                assert_eq!(2286, sum);
-            } else {
-                assert!(false);
-            }
-        }
     }
 }
