@@ -14,7 +14,7 @@ fn copy_data_files_to_target_dir() {
     let dir = std::fs::read_dir("./src/puzzles").expect("failed to read puzzles directory");
     for data_entry in dir
         .map(|file_path| file_path.expect("failed to read puzzle file"))
-        .filter(|file_path| file_path.file_name().to_string_lossy().ends_with(".data"))
+        .filter(|file_path| file_path.file_name().to_string_lossy().ends_with(".input"))
     {
         let source = data_entry.path();
         let target =

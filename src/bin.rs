@@ -22,7 +22,7 @@ fn main() {
     match matches.subcommand() {
         Some(command) => {
             if let Err(error) = run_command(command) {
-                error!("{}", error)
+                error!("{}", error);
             }
         }
         None => error!("Missing required command"),

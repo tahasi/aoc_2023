@@ -32,17 +32,49 @@ pub mod day_25;
 
 #[derive(Error, Debug)]
 pub enum PuzzleError {
-    #[error("load data file '{path}' failure: {source}")]
-    LoadDataFailure {
+    #[error("load input file '{path}' failure: {source}")]
+    LoadInputFailure {
         path: String,
         source: std::io::Error,
     },
-    #[error("invalid data at {line}: {reason}")]
-    InvalidData { line: usize, reason: String },
+    #[error("invalid input at {line}: {reason}")]
+    InvalidInput { line: usize, reason: String },
     #[error("not implemented")]
     NotImplemented,
-    #[error("{0}")]
-    Unexpected(String),
+    #[error("{message}")]
+    Unexpected { message: String },
+    #[error("{message}: {source}")]
+    UnexpectedErr {
+        message: String,
+        #[source]
+        source: anyhow::Error,
+    },
+}
+
+impl PuzzleError {
+    fn from_io_error<S: AsRef<OsStr> + ?Sized>(path: &S, source: io::Error) -> Self {
+        let path = path.as_ref().to_string_lossy().to_string();
+        PuzzleError::LoadInputFailure { path, source }
+    }
+
+    fn invalid_input(line: usize, reason: &str) -> Self {
+        let reason = reason.to_owned();
+        PuzzleError::InvalidInput { line, reason }
+    }
+
+    fn unexpected(message: &str) -> Self {
+        let message = message.to_owned();
+        PuzzleError::Unexpected { message }
+    }
+
+    #[allow(dead_code)]
+    fn unexpected_err(message: &str, err: anyhow::Error) -> Self {
+        let message = message.to_owned();
+        PuzzleError::UnexpectedErr {
+            message,
+            source: err,
+        }
+    }
 }
 
 pub type Result<T> = core::result::Result<T, PuzzleError>;
@@ -123,20 +155,13 @@ impl Puzzle {
     }
 }
 
-impl PuzzleError {
-    fn from_io_error<S: AsRef<OsStr> + ?Sized>(path: &S, source: io::Error) -> Self {
-        let path = path.as_ref().to_string_lossy().to_string();
-        PuzzleError::LoadDataFailure { path, source }
-    }
-}
-
-fn read_data_file(day: i32, part: i32) -> Result<String> {
-    let data_file_name = format!("day_{day:02}.part_{part:02}.data");
+fn read_input_file(day: i32, part: i32) -> Result<String> {
+    let data_file_name = format!("day_{day:02}.part_{part:02}.input");
     let exe_path =
         env::current_exe().map_err(|err| PuzzleError::from_io_error(&data_file_name, err))?;
-    let exe_dir_path = exe_path.parent().ok_or_else(|| {
-        PuzzleError::Unexpected("failed to get executable parent path".to_string())
-    })?;
+    let exe_dir_path = exe_path
+        .parent()
+        .ok_or_else(|| PuzzleError::unexpected("failed to get executable parent path"))?;
     let path = Path::new(exe_dir_path).join(data_file_name);
     match std::fs::read_to_string(&path) {
         Ok(string) => Ok(string),
