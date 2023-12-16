@@ -1,14 +1,14 @@
 use super::{read_input_file, Result};
 
 pub fn run_part_one() -> Result<()> {
-    let input = read_input_file(3, 1)?;
+    let input = read_input_file(3, None)?;
     let sum = part_one::solve(input.trim())?;
     println!("Day three part one: sum of part numbers: {sum}");
     Ok(())
 }
 
 pub fn run_part_two() -> Result<()> {
-    let input = read_input_file(3, 2)?;
+    let input = read_input_file(3, None)?;
     let sum = part_two::solve(input.trim())?;
     println!("Day three part two: sum of gear ratios: {sum}");
     Ok(())

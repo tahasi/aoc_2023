@@ -1,7 +1,7 @@
 use crate::{read_input_file, PuzzleError, Result};
 
 pub fn run_part_one() -> Result<()> {
-    let input = read_input_file(2, 1)?;
+    let input = read_input_file(2, None)?;
     let bag_content = Set {
         red: 12,
         green: 13,
@@ -13,7 +13,7 @@ pub fn run_part_one() -> Result<()> {
 }
 
 pub fn run_part_two() -> Result<()> {
-    let input = read_input_file(2, 2)?;
+    let input = read_input_file(2, None)?;
     let sum = part_two::solve(input.trim())?;
     println!("Day two part two: sum of required bag set powers: {sum}");
     Ok(())

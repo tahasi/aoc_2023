@@ -1,14 +1,14 @@
 use crate::{read_input_file, Result};
 
 pub fn run_part_one() -> Result<()> {
-    let input = read_input_file(1, 1)?;
+    let input = read_input_file(1, None)?;
     let sum = part_one::solve(input.trim())?;
     println!("Day one part one: sum of calibration values: {sum}");
     Ok(())
 }
 
 pub fn run_part_two() -> Result<()> {
-    let input = read_input_file(1, 2)?;
+    let input = read_input_file(1, None)?;
     let sum = part_two::solve(input.trim())?;
     println!("Day one part two: sum of calibration values: {sum}");
     Ok(())

@@ -155,8 +155,12 @@ impl Puzzle {
     }
 }
 
-fn read_input_file(day: i32, part: i32) -> Result<String> {
-    let data_file_name = format!("day_{day:02}.part_{part:02}.input");
+fn read_input_file(day: i32, part: Option<i32>) -> Result<String> {
+    let data_file_name = if let Some(part) = part {
+        format!("day_{day:02}.part_{part:02}.input")
+    } else {
+        format!("day_{day:02}.input")
+    };
     let exe_path =
         env::current_exe().map_err(|err| PuzzleError::from_io_error(&data_file_name, err))?;
     let exe_dir_path = exe_path
