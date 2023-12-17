@@ -1,8 +1,5 @@
-use std::ffi::OsStr;
+use std::env;
 use std::path::Path;
-use std::{env, io};
-
-use thiserror::Error;
 
 pub mod day_01;
 pub mod day_02;
@@ -30,54 +27,11 @@ pub mod day_23;
 pub mod day_24;
 pub mod day_25;
 
-#[derive(Error, Debug)]
-pub enum PuzzleError {
-    #[error("load input file '{path}' failure: {source}")]
-    LoadInputFailure {
-        path: String,
-        source: std::io::Error,
-    },
-    #[error("invalid input at {line}: {reason}")]
-    InvalidInput { line: usize, reason: String },
-    #[error("not implemented")]
-    NotImplemented,
-    #[error("{message}")]
-    Unexpected { message: String },
-    #[error("{message}: {source}")]
-    UnexpectedErr {
-        message: String,
-        #[source]
-        source: anyhow::Error,
-    },
-}
+pub(crate) mod parser;
+pub(crate) mod result;
 
-impl PuzzleError {
-    fn from_io_error<S: AsRef<OsStr> + ?Sized>(path: &S, source: io::Error) -> Self {
-        let path = path.as_ref().to_string_lossy().to_string();
-        PuzzleError::LoadInputFailure { path, source }
-    }
+use result::*;
 
-    fn invalid_input(line: usize, reason: &str) -> Self {
-        let reason = reason.to_owned();
-        PuzzleError::InvalidInput { line, reason }
-    }
-
-    fn unexpected(message: &str) -> Self {
-        let message = message.to_owned();
-        PuzzleError::Unexpected { message }
-    }
-
-    #[allow(dead_code)]
-    fn unexpected_err(message: &str, err: anyhow::Error) -> Self {
-        let message = message.to_owned();
-        PuzzleError::UnexpectedErr {
-            message,
-            source: err,
-        }
-    }
-}
-
-pub type Result<T> = core::result::Result<T, PuzzleError>;
 type Fn = fn() -> Result<()>;
 
 #[allow(clippy::type_complexity)]

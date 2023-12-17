@@ -63,11 +63,7 @@ pqr3stu8vwx
 a1b2c3d4e5f
 treb7uchet"#;
 
-            if let Ok(sum) = solve(input.trim()) {
-                assert_eq!(142, sum);
-            } else {
-                assert!(false);
-            }
+            assert_eq!(Ok(142), solve(input.trim()));
         }
     }
 }
@@ -156,11 +152,7 @@ zoneight234
 7pqrstsixteen
 "#;
 
-            if let Ok(sum) = solve(input.trim()) {
-                assert_eq!(281, sum);
-            } else {
-                assert!(false);
-            }
+            assert_eq!(Ok(281), solve(input.trim()));
         }
     }
 }

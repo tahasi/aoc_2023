@@ -56,11 +56,7 @@ mod part_one {
 ......755.
 ...$.*....
 .664.598.."#;
-            if let Ok(sum) = solve(input.trim()) {
-                assert_eq!(4361, sum);
-            } else {
-                assert!(false);
-            }
+            assert_eq!(Ok(4361), solve(input.trim()));
         }
     }
 }
@@ -91,11 +87,7 @@ mod part_two {
 ......755.
 ...$.*....
 .664.598.."#;
-            if let Ok(sum) = solve(input.trim()) {
-                assert_eq!(467835, sum);
-            } else {
-                assert!(false);
-            }
+            assert_eq!(Ok(467835), solve(input.trim()));
         }
     }
 }

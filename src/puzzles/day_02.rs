@@ -1,4 +1,4 @@
-use crate::{read_input_file, PuzzleError, Result};
+use crate::{read_input_file, Result};
 
 pub fn run_part_one() -> Result<()> {
     let input = read_input_file(2, None)?;
@@ -53,7 +53,8 @@ impl Set {
 }
 
 mod part_one {
-    use super::{parser, Result, Set};
+    use super::{parser, Set};
+    use crate::Result;
     use lazy_static::lazy_static;
     use regex::Regex;
 
@@ -89,11 +90,7 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"#;
                 green: 13,
                 blue: 14,
             };
-            if let Ok(sum) = solve(input.trim(), &bag_content) {
-                assert_eq!(8, sum);
-            } else {
-                assert!(false);
-            }
+            assert_eq!(Ok(8), solve(input.trim(), &bag_content));
         }
     }
 }
@@ -124,17 +121,14 @@ Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
 Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
 Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"#;
-            if let Ok(sum) = solve(input.trim()) {
-                assert_eq!(2286, sum);
-            } else {
-                assert!(false);
-            }
+            assert_eq!(Ok(2286), solve(input.trim()));
         }
     }
 }
 
 mod parser {
-    use super::{PuzzleError, Result, Set};
+    use super::Set;
+    use crate::{PuzzleError, Result};
     use lazy_static::lazy_static;
     use regex::Regex;
 
