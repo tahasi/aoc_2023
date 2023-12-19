@@ -183,22 +183,24 @@ mod parser {
             .map(|(line, input)| {
                 let split_input: Vec<&str> = input.split(':').collect();
                 if split_input.len() != 2 {
-                    return Err(PuzzleError::invalid_input(
+                    return Err(PuzzleError::invalid_line_input(
                         line,
                         "incorrect number of semi colons",
                     ));
                 }
-                let id = parse_game_id(split_input[0])
-                    .ok_or_else(|| PuzzleError::invalid_input(line, "missing game identifier"))?;
+                let id = parse_game_id(split_input[0]).ok_or_else(|| {
+                    PuzzleError::invalid_line_input(line, "missing game identifier")
+                })?;
                 let sets = split_input[1]
                     .split(';')
                     .map(|set| {
-                        parse_game_set(set)
-                            .ok_or_else(|| PuzzleError::invalid_input(line, "invalid set '{set}'"))
+                        parse_game_set(set).ok_or_else(|| {
+                            PuzzleError::invalid_line_input(line, "invalid set '{set}'")
+                        })
                     })
                     .collect::<Result<Vec<Set>>>()?;
                 if sets.is_empty() {
-                    return Err(PuzzleError::invalid_input(line, "missing games sets"));
+                    return Err(PuzzleError::invalid_line_input(line, "missing games sets"));
                 }
                 Ok((id, sets))
             })

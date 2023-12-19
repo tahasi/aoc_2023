@@ -10,7 +10,9 @@ pub enum PuzzleError {
         source: std::io::Error,
     },
     #[error("invalid input at {line}: {reason}")]
-    InvalidInput { line: usize, reason: String },
+    InvalidLineInput { line: usize, reason: String },
+    #[error("invalid input: {reason}")]
+    InvalidInput { reason: String },
     #[error("not implemented")]
     NotImplemented,
     #[error("{message}")]
@@ -29,9 +31,14 @@ impl PuzzleError {
         PuzzleError::LoadInputFailure { path, source }
     }
 
-    pub(crate) fn invalid_input(line: usize, reason: &str) -> Self {
+    pub(crate) fn invalid_line_input(line: usize, reason: &str) -> Self {
         let reason = reason.to_owned();
-        PuzzleError::InvalidInput { line, reason }
+        PuzzleError::InvalidLineInput { line, reason }
+    }
+
+    pub(crate) fn invalid_input(reason: &str) -> Self {
+        let reason = reason.to_owned();
+        PuzzleError::InvalidInput { reason }
     }
 
     pub(crate) fn unexpected(message: &str) -> Self {
@@ -63,11 +70,11 @@ impl PartialEq for PuzzleError {
                 },
             ) => l_path == r_path && l_source.to_string() == r_source.to_string(),
             (
-                Self::InvalidInput {
+                Self::InvalidLineInput {
                     line: l_line,
                     reason: l_reason,
                 },
-                Self::InvalidInput {
+                Self::InvalidLineInput {
                     line: r_line,
                     reason: r_reason,
                 },

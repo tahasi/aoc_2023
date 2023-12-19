@@ -133,21 +133,21 @@ mod parser {
             .map(|line| line.trim())
             .collect::<Vec<_>>();
         if lines.len() != 2 {
-            return Err(PuzzleError::invalid_input(
+            return Err(PuzzleError::invalid_line_input(
                 lines.len(),
                 "invalid number of lines",
             ));
         }
 
         if !lines[0].starts_with("Time:") {
-            return Err(PuzzleError::invalid_input(
+            return Err(PuzzleError::invalid_line_input(
                 lines.len(),
                 "first line must be time",
             ));
         }
 
         if !lines[1].starts_with("Distance:") {
-            return Err(PuzzleError::invalid_input(
+            return Err(PuzzleError::invalid_line_input(
                 lines.len(),
                 "second line must be distance",
             ));
@@ -164,7 +164,7 @@ mod parser {
         };
 
         if times.len() != distances.len() {
-            return Err(PuzzleError::invalid_input(
+            return Err(PuzzleError::invalid_line_input(
                 lines.len(),
                 "time and distance count of entries must match",
             ));

@@ -150,7 +150,7 @@ mod parser {
                         if let Some(token) = capture.get(1) {
                             builder.process_token(token.as_str())
                         } else {
-                            Err(PuzzleError::invalid_input(line, "failed to parse"))
+                            Err(PuzzleError::invalid_line_input(line, "failed to parse"))
                         }
                     },
                 );

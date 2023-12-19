@@ -201,7 +201,7 @@ mod parser {
                     if input.len() == 2 {
                         return Ok((almanac_builder, Some(ComponentMapBuilder::new(input[0]))));
                     }
-                    return Err(PuzzleError::invalid_input(line, "invalid map header"));
+                    return Err(PuzzleError::invalid_line_input(line, "invalid map header"));
                 }
                 if !almanac_builder.has_seeds() {
                     almanac_builder.add_seeds(numbers)?;
@@ -209,7 +209,7 @@ mod parser {
                 }
                 if let Some(mut component_builder) = component_map_builder.take() {
                     if numbers.len() != 3 {
-                        return Err(PuzzleError::invalid_input(
+                        return Err(PuzzleError::invalid_line_input(
                             line,
                             "incorrect map value count",
                         ));

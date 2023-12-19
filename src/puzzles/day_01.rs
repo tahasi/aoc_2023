@@ -40,7 +40,7 @@ mod part_one {
             match values {
                 Some((first, last)) => sum += (first * 10) + last,
                 None => {
-                    return Err(PuzzleError::invalid_input(
+                    return Err(PuzzleError::invalid_line_input(
                         line,
                         "line does not have any digits",
                     ))
@@ -125,7 +125,7 @@ mod part_two {
             match values {
                 Some((first, last)) => sum += (first * 10) + last,
                 None => {
-                    return Err(PuzzleError::invalid_input(
+                    return Err(PuzzleError::invalid_line_input(
                         line,
                         "line does not have any digits",
                     ));
