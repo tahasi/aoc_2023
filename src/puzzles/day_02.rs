@@ -53,8 +53,7 @@ impl Set {
 }
 
 mod part_one {
-    use super::{parser, Set};
-    use crate::Result;
+    use super::{parser, Result, Set};
     use lazy_static::lazy_static;
     use regex::Regex;
 

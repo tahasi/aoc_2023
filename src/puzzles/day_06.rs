@@ -1,6 +1,6 @@
 use std::ops::Range;
 
-use super::{read_input_file, PuzzleError, Result};
+use crate::{read_input_file, PuzzleError, Result};
 
 pub fn run_part_one() -> Result<()> {
     let input = read_input_file(6, None)?;

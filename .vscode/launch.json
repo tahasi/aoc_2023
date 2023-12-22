@@ -20,10 +20,11 @@
                 }
             },
             "args": [
+                "--debug",
                 "day",
-                "five",
+                "eight",
                 "part",
-                "one"
+                "two"
             ],
             "cwd": "${workspaceFolder}"
         },

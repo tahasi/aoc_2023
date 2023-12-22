@@ -1,4 +1,4 @@
-use super::{read_input_file, Result};
+use crate::{read_input_file, Result};
 
 pub fn run_part_one() -> Result<()> {
     let input = read_input_file(3, None)?;

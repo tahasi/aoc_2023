@@ -1,9 +1,9 @@
-use super::PuzzleError;
+use super::{PuzzleError, Result};
 
-pub fn run_part_one() -> Result<(), PuzzleError> {
+pub fn run_part_one() -> Result<()> {
     Err(PuzzleError::NotImplemented)
 }
 
-pub fn run_part_two() -> Result<(), PuzzleError> {
+pub fn run_part_two() -> Result<()> {
     Err(PuzzleError::NotImplemented)
 }
