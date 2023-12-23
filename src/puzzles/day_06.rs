@@ -17,17 +17,17 @@ pub fn run_part_two() -> Result<()> {
 }
 
 struct BoatRace {
-    time: usize,
-    record_distance: usize,
+    time: u64,
+    record_distance: u64,
 }
 
 impl BoatRace {
-    fn winning_charge_times(&self) -> impl Iterator<Item = usize> + '_ {
+    fn winning_charge_times(&self) -> impl Iterator<Item = u64> + '_ {
         (1..self.time - 1)
             .filter(|charge_time| (self.time - charge_time) * charge_time > self.record_distance)
     }
 
-    fn winning_charge_range(&self) -> Range<usize> {
+    fn winning_charge_range(&self) -> Range<u64> {
         let mut start = self.time / 2;
         while start > 0 && start * (self.time - start) > self.record_distance {
             start /= 2;
@@ -91,7 +91,7 @@ mod part_two {
         Result,
     };
 
-    pub fn solve(input: &str) -> Result<usize> {
+    pub fn solve(input: &str) -> Result<u64> {
         let boat_races = parse(input, NumbersMode::Merge)?;
         let winning_charge_ranges = boat_races
             .iter()
@@ -180,22 +180,22 @@ mod parser {
             .collect())
     }
 
-    fn independent_numbers(input: &str) -> Vec<usize> {
-        input.numbers().collect::<Vec<_>>()
+    fn independent_numbers(input: &str) -> Vec<u64> {
+        input.unsigned_numbers().collect::<Vec<_>>()
     }
 
-    fn merged_numbers(input: &str) -> usize {
+    fn merged_numbers(input: &str) -> u64 {
         input
-            .numbers()
+            .unsigned_numbers()
             .fold(0, |merged, number| merged * magnitude(number) + number)
     }
 
-    fn magnitude(mut number: usize) -> usize {
+    fn magnitude(mut number: u64) -> u64 {
         let mut exp = 0;
         while number > 0 {
             number /= 10;
             exp += 1;
         }
-        10_usize.pow(exp)
+        10_u64.pow(exp)
     }
 }

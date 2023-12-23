@@ -24,30 +24,30 @@ enum SeedMode {
 }
 
 struct Almanac {
-    seed_ranges: Vec<Range<usize>>,
+    seed_ranges: Vec<Range<u64>>,
     component_maps: Vec<ComponentMap>,
 }
 
 impl Almanac {
-    fn seeds(&self) -> impl Iterator<Item = usize> + '_ {
+    fn seeds(&self) -> impl Iterator<Item = u64> + '_ {
         self.seed_ranges.iter().flat_map(|range| range.to_owned())
     }
 
-    fn seeds_count(&self) -> usize {
+    fn seeds_count(&self) -> u64 {
         self.seed_ranges
             .iter()
             .map(|range| range.end - range.start)
             .sum()
     }
 
-    fn lowest_location(&self) -> usize {
+    fn lowest_location(&self) -> u64 {
         let count = self.seeds_count();
         let report_progress_interval = count / 100 + 1;
         debug!("finding lowest location of {} seeds", count);
         self.seeds()
             .enumerate()
             .map(|(progress, id)| {
-                if progress % report_progress_interval == 0 {
+                if progress as u64 % report_progress_interval == 0 {
                     debug!(
                         "{}/{} {}%",
                         progress,
@@ -70,7 +70,7 @@ struct ComponentMap {
 }
 
 impl ComponentMap {
-    fn map(&self, id: usize) -> usize {
+    fn map(&self, id: u64) -> u64 {
         if let Some(map) = self
             .maps
             .iter()
@@ -94,9 +94,9 @@ impl ComponentMap {
 
 #[derive(Debug, PartialEq)]
 struct RangeMap {
-    destination: usize,
-    source: usize,
-    length: usize,
+    destination: u64,
+    source: u64,
+    length: u64,
 }
 
 #[cfg(test)]
@@ -138,7 +138,7 @@ humidity-to-location map:
 mod part_one {
     use super::{parser, Result, SeedMode};
 
-    pub fn solve(input: &str) -> Result<usize> {
+    pub fn solve(input: &str) -> Result<u64> {
         let almanac = parser::parse(input, SeedMode::Independent)?;
         Ok(almanac.lowest_location())
     }
@@ -157,7 +157,7 @@ mod part_one {
 mod part_two {
     use super::{parser, Result, SeedMode};
 
-    pub fn solve(input: &str) -> Result<usize> {
+    pub fn solve(input: &str) -> Result<u64> {
         let almanac = parser::parse(input, SeedMode::Range)?;
         Ok(almanac.lowest_location())
     }
@@ -195,7 +195,7 @@ mod parser {
                     }
                     return Ok((almanac_builder, component_map_builder));
                 }
-                let numbers = input.numbers().collect::<Vec<_>>();
+                let numbers = input.unsigned_numbers().collect::<Vec<u64>>();
                 if numbers.is_empty() {
                     let input = input.split(' ').collect::<Vec<_>>();
                     if input.len() == 2 {
@@ -228,7 +228,7 @@ mod parser {
 
     struct AlmanacBuilder {
         seed_mode: SeedMode,
-        seed_ranges: Option<Vec<Range<usize>>>,
+        seed_ranges: Option<Vec<Range<u64>>>,
         component_maps: Option<Vec<ComponentMap>>,
     }
 
@@ -241,7 +241,7 @@ mod parser {
             }
         }
 
-        fn add_seeds(&mut self, seeds: Vec<usize>) -> Result<()> {
+        fn add_seeds(&mut self, seeds: Vec<u64>) -> Result<()> {
             match self.seed_mode {
                 SeedMode::Independent => {
                     let seed_ranges = seeds.into_iter().map(|seed| (seed..(seed + 1))).collect();
@@ -309,7 +309,7 @@ mod parser {
             }
         }
 
-        fn add_range(&mut self, destination: usize, source: usize, length: usize) {
+        fn add_range(&mut self, destination: u64, source: u64, length: u64) {
             let map = RangeMap {
                 destination,
                 source,
@@ -379,7 +379,7 @@ mod parser {
             }
         }
 
-        fn range(destination: usize, source: usize, length: usize) -> RangeMap {
+        fn range(destination: u64, source: u64, length: u64) -> RangeMap {
             RangeMap {
                 destination,
                 source,
@@ -387,7 +387,7 @@ mod parser {
             }
         }
 
-        fn seeds_from_range(start: usize, length: usize) -> Vec<usize> {
+        fn seeds_from_range(start: u64, length: u64) -> Vec<u64> {
             (start..(start + length)).into_iter().collect()
         }
     }
